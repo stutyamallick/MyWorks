@@ -39,7 +39,7 @@
     <finalName>AJS_WebService</finalName>
   </build>
   <properties>
-  	<spring.version>4.2.1.RELEASE</spring.version>
+  	<spring.version>5.2.3.RELEASE</spring.version>
   	<jdk.version>1.8</jdk.version>
   </properties>
 </project>
