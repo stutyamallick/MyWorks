@@ -1,0 +1,44 @@
+<html>
+    <head>
+        <title>Test</title>
+        <style type="text/css">
+            
+			.heading-para-ct {
+			  width: 100%;
+			  overflow: hidden;
+			}
+			.heading-para {
+			  line-height: 0.5;
+			  text-align: center;
+			}
+			.heading-para span {
+			  display: inline-block;
+			  position: relative;  
+			}
+			.heading-para span:before,
+			.heading-para span:after {
+			  content: "";
+			  position: absolute;
+			  height: 0.2rem;
+			  border-bottom: 1px solid red;
+			  top: 0;
+			  width: 600px;
+			}
+			.heading-para span:before {
+			  right: 100%;
+			  margin-right: 0.5rem;
+			}
+			.heading-para span:after {
+			  left: 100%;
+			  margin-left: 0.5rem;
+			}
+        </style>
+    </head>
+    <body>
+		<div>
+			<div class="heading-para-ct">
+			  <p class="heading-para"><span>Heading (It can be any long!!!)</span></p>
+			</div>
+		</div>
+    </body>
+</html>

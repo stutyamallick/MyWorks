@@ -1,0 +1,89 @@
+<html>
+
+<head>
+<style>
+label {
+  display: block;
+  margin: 20px 0 0;
+  border-bottom: 1px solid green;
+}
+label:hover {
+  text-decoration: underline;
+}
+
+
+
+/* Initial styles */
+.myCheckbox {
+  position: absolute;
+  left: -999em;
+}
+
+.myDivInner{
+  position: relative;
+  overflow: hidden;
+}
+
+.myDivHide{
+  width: 50%;
+  float: left;
+  clear: both;
+  border: 1px solid #000;
+  background: red;
+  opacity: 1;
+  overflow: hidden;
+  transform: translateY(0);
+  margin: 0;
+  transition: all 0.5s linear, margin 0s linear 0s;
+}
+
+/* Transform logic styles */
+.my-parent-container input[type="checkbox"]:checked + .myDivInner .myDivHide {
+  opacity: 0;
+  transform: translateY(-100%);
+  margin-bottom: -999em;
+  transition: all 0.5s linear, margin 0s linear 1.5s;
+}
+
+
+</style>
+</head>
+
+<body>
+
+<!-- Method 2 - using float and transform and negative margin -->
+
+<br/>
+<div class="my-parent-container">
+	<div><label for="my">my Click</label></div>
+	<input type="checkbox" class="myCheckbox" id="my" checked/>
+	<div class="myDivInner">
+		<div class="myDivHide">my div</div>
+	</div>
+</div>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

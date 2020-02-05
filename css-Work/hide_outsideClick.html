@@ -1,0 +1,38 @@
+<html>
+    <head>
+        <title>Test</title>
+        <style type="text/css">
+            .container { width: 400px; height: 280px; background-color: #e5e5e5;}
+            #welcomeDiv { width: 100px; height: 100px; background-color: #b0b0b0; }
+        </style>
+    </head>
+    <body>
+
+        <div class="container" onclick="hideDiv();">
+            <button onclick="showDiv();">
+                Hello
+            </button>
+
+            <div id="welcomeDiv">
+                <h1>Welcome</h1>
+            </div>
+        </div>
+
+        <script type="text/javascript">
+            function showDiv() {
+                document.getElementById('welcomeDiv').style.display = "inherit";
+                event.stopPropagation();
+                // stop propagation on button click event
+            }
+
+            function hideDiv() {
+                var target = event.target || event.srcElement;
+                // filter event handling when the event bubbles
+                if (event.currentTarget == target) {
+                    document.getElementById('welcomeDiv').style.display = "none";
+                }
+
+            }
+        </script>
+    </body>
+</html>
