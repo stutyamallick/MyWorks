@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>AJS Web Service</title>
+
+<script type="text/javascript" src="resources/angular.min.js"></script>
+<script type="text/javascript" src="resources/angular-route.min.js"></script>
+<script type="text/javascript" src="app.js"></script>
+<script type="text/javascript" src="application/controllers/service.js"></script>
+<script type="text/javascript" src="application/controllers/paymentController.js"></script>
+<script type="text/javascript" src="application/controllers/confirmationController.js"></script>
+</head>
+<body ng-app="paymentApp">
+	<div>
+		<a ng-href="#/home" style="float: left;"><button>HOME</button></a><br>
+		<a ng-href="#/payment" style="float: left;"><button>CHOOSE PAYMENT MODE</button></a><br>
+		<a ng-href="#" style="float: left;"><button>CONFIRM PAYMENT MODE</button></a><br>
+	</div>
+	<div ng-view></div>
+</body>
+</html>

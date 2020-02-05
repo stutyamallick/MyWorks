@@ -1,0 +1,7 @@
+{"paymentComboData":[
+	{"display":"Credit Card","value":"cc"},
+	{"display":"Debit Card","value":"dc"},
+	{"display":"Net Banking","value":"nb"},
+	{"display":"Cash On Dilivery","value":"cod"}
+	]
+}

@@ -1,0 +1,10 @@
+<div ng-controller="confirmationController">
+	{{header}}
+	<br>
+	You selected payment mode as <label style="color: orange;" ng-model="paymentModeSelectedForCnf" ng-bind="paymentModeSelectedForCnf"></label> 
+	for Delivery at pin code <label style="color: orange;" ng-model="pincodeEnteredForCnf" ng-bind="pincodeEnteredForCnf"></label>.
+	<br>
+	<button ng-click="onConfirmClick(paymentModeSelectedForCnf,pincodeEnteredForCnf)">Confirm</button>
+	<div ng-show="finalMsg">{{message}}</div>
+	
+</div>

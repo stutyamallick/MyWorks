@@ -1,0 +1,11 @@
+<div ng-controller="paymentController">
+	<label>{{header}}</label>
+	<br>
+	Enter your Pin code: &nbsp;&nbsp;&nbsp;&nbsp;<input type="text" ng-model="pincode" ng-blur="onPincodeEnter(pincode)">
+	<p style="color: red;" ng-show="errorMsgField">{{errorMsg}}</p>
+	<br>
+	Select Payment Mode: &nbsp;<select ng-model="paymentModeCombo" 
+			ng-options="x.display for x in comboData"></select>
+	<br>
+	<a href="#/paymentConfirmation"><button ng-click="onProceedBtnClick(pincode,paymentModeCombo)">Proceed</button></a>
+</div>
