@@ -1,0 +1,142 @@
+<html>
+<head>
+<meta charset ="utf-8">
+<script src="https://d3js.org/d3.v5.min.js"></script>
+<style>
+	
+body {
+	margin: auto;
+	width: 650px;
+	font: 12px arial;
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="chart"></div>
+
+<script>
+	var data = [
+			{ "property":"Cen", "contribution":"14000", "distribution":"2000" },
+			{ "property":"300 S Brevard", "contribution":"40000", "distribution":"10000" },
+			{ "property":"Dominion Point", "contribution":"13000", "distribution":"4000" },
+			{ "property":"Aplle Valley", "contribution":"8000", "distribution":"0" },
+			{ "property":"1771 N Street", "contribution":"12000", "distribution":"0" },
+			{ "property":"Atlanta Portfolio", "contribution":"50000", "distribution":"35000" },
+			{ "property":"Lake Jackson", "contribution":"4000", "distribution":"1000" },
+			{ "property":"Quorom", "contribution":"30000", "distribution":"5000" },
+			{ "property":"Stratum", "contribution":"22000", "distribution":"0" },
+			{ "property":"River South", "contribution":"48000", "distribution":"0" }
+	];
+
+	var keys = ["contribution", "distribution"];
+	
+	var colors = ["#003764", "#81BD41"];
+	
+	stackedbarChartUtility(data, keys, colors, 200, 400, "property", "chart", "CONTRIBUTION/DISTRIBUTION ($)");
+
+	function stackedbarChartUtility(data, keys, colors, height, width, accessor, divId, yAxisLabel) {
+		var chartNode = document.getElementById(divId);
+		if (chartNode !== null) {
+			while (chartNode.firstChild) {
+				chartNode.removeChild(chartNode.firstChild);
+			}
+		}
+		const margin = {top: 40, left: 20, bottom: 0, right: 0}
+		var svg = d3.select("#"+divId)
+					.append("svg")
+					.attr("width", width + margin.top + margin.left)
+					.attr("height", height + margin.top + margin.left)
+					.append("g")
+					.attr("transform", "translate(" + margin.top + "," + margin.left + ")");
+			
+		svg.append("text")
+			.attr("transform", "rotate(-90)")
+			.attr("y", -margin.left)
+			.attr("x", 0 - (height / 2))
+			.attr("dy", "1em")
+			.style("text-anchor", "middle")
+			.style('font-family', "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif")
+			.style('font-size', '90%')
+			.style('fill', '#252525')
+			.text(yAxisLabel)
+
+		var x = d3.scaleBand()
+			.range([margin.left, width])
+			.padding(0.5)
+
+		var y = d3.scaleLinear()
+			.rangeRound([height, 2])
+
+		var xAxis = svg.append("g")
+			.attr("transform", `translate(0,${height - margin.bottom})`)
+			.attr("class", "x-axis")
+
+		var yAxis = svg.append("g")
+			.attr("transform", `translate(${margin.left},0)`)
+			.attr("class", "y-axis")
+
+		var z = d3.scaleOrdinal()
+			.range(colors)
+			.domain(keys);	
+
+		data.forEach(function(d) {
+			d.total = d3.sum(keys, k => +d[k])
+			return d;
+		})
+
+		y.domain([0, d3.max(data, d => d3.sum(keys, k => +d[k]))]).nice();
+
+		svg.selectAll(".y-axis").transition().duration(0)
+			.call(d3.axisLeft(y).ticks(null, "s"))		
+
+		x.domain(data.map(d => d[accessor]));
+
+		svg.selectAll(".x-axis").transition().duration(0)
+			.call(d3.axisBottom(x).tickSizeOuter(0))
+
+		var group = svg.selectAll("g.layer")
+			.data(d3.stack().keys(keys)(data), d => d.key)
+
+		group.exit().remove()
+
+		group.enter().append("g")
+			.classed("layer", true)
+			.attr("fill", d => z(d.key));
+
+		var bars = svg.selectAll("g.layer").selectAll("rect")
+			.data(d => d, e => e.data[accessor]);
+
+		bars.exit().remove()
+
+		bars.enter().append("rect")
+			.attr("width", x.bandwidth())
+			.merge(bars)
+		.transition().duration(0)
+			.attr("x", d => x(d.data[accessor]))
+			.attr("y", d => y(d[1]))
+			.attr("height", d => y(d[0]) - y(d[1]));
+	
+		/* Uncomment below block to add text on top of the bar */
+		/*var text = svg.selectAll(".text")
+			.data(data, d => d[accessor]);
+
+		text.exit().remove()
+
+		text.enter().append("text")
+			.attr("class", "text")
+			.attr("text-anchor", "middle")
+			.merge(text)
+		.transition().duration(0)
+			.attr("x", d => x(d[accessor]) + x.bandwidth() / 2)
+			.attr("y", d => y(d.total) - 5)
+			.text(d => d.total)*/
+	
+	}
+
+</script>
+
+</body>
+</html> 

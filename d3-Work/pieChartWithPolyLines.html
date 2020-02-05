@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+
+
+<head>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.12.0/d3.min.js"></script>
+
+</head>
+
+<body ng-app="myApp" ng-controller="myCtrl">
+
+  <svg></svg>
+
+
+  <script>
+    //module declaration 
+    //var app = angular.module('myApp', []);
+
+    //Controller declaration
+    //app.controller('myCtrl', function($scope) {
+
+    var $scope = {};
+
+    $scope.svgWidth = 800; //svg Width
+    $scope.svgHeight = 500; //svg Height 
+
+    //Data in proper format 
+    var data = [{
+      "letter": "A",
+      "frequency": "60"
+    }, {
+      "letter": "B",
+      "frequency": "30"
+    }, {
+      "letter": "C",
+      "frequency": "10"
+    }];
+
+    //removing prior svg elements ie clean up svg 
+    d3.select('svg').selectAll("*").remove();
+
+    //resetting svg height and width in current svg 
+    d3.select("svg").attr("width", $scope.svgWidth).attr("height", $scope.svgHeight);
+
+    //Setting up of our svg with proper calculations 
+    var svg = d3.select("svg");
+    var margin = {
+      top: 20,
+      right: 20,
+      bottom: 30,
+      left: 40
+    };
+    var width = svg.attr("width") - margin.left - margin.right;
+    var height = svg.attr("height") - margin.top - margin.bottom;
+    var radius = 200;
+
+    //Plotting our base area in svg in which chart will be shown 
+    var g = svg.append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+    var pie = d3.pie().sort(null)
+      .value(function(d) {
+        return d.frequency;
+      });
+
+    var piedata = pie(data);
+
+    var arc = d3.arc()
+      .innerRadius(radius - 100)
+      .outerRadius(radius - 50);
+      
+    var outerArc = d3.arc()
+	    .innerRadius(radius * 0.9)
+	    .outerRadius(radius * 0.9);
+
+    var path = g.selectAll("path")
+      .data(piedata)
+      .enter().append("path")
+      .attr("fill", function() {
+        return "hsl(" + Math.random() * 360 + ",100%,50%)";
+      })
+      .attr("d", arc);
+	
+	function midAngle(d) {
+      return d.startAngle + (d.endAngle - d.startAngle) / 2;
+    }
+	
+	/*Text*/
+    g.selectAll("text").data(piedata)
+      .enter()
+      .append("text")
+      .attr("text-anchor", "middle")
+      .attr("transform", function(d){
+        var pos = outerArc.centroid(d);
+        pos[0] = radius * (midAngle(d) < Math.PI ? 1 : -1);
+        return "translate("+ pos +")";
+      })
+      .text(function(d) {
+        return d.data.letter;
+      });
+
+    /*Polyline*/
+    var polyline = g.selectAll("polyline")
+      .data(piedata, function(d) {
+        return d.data.letter
+      })
+      .enter()
+      .append("polyline")
+      .attr("points", function(d) {
+        var pos = outerArc.centroid(d);
+            pos[0] = radius * 0.95 * (midAngle(d) < Math.PI ? 1 : -1);
+            
+        return [arc.centroid(d), outerArc.centroid(d), pos];
+      })
+      .style("fill", "none")
+      .style("stroke", "black")
+      .style("stroke-width", "2px");
+
+    //});
+  </script>
+</body>
+
+</html>
