@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+
+
+<head>
+	<body>
+
+		<div>
+			<div id="donutChartCt"></div>
+		</div>
+
+	</body>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.12.0/d3.min.js"></script>
+  
+  <script>
+	const chartColor = [
+		{
+			colorLabel: "green",
+			arcColor: "#81bd41",
+			lineColor: "#81bd41",
+			textColor: "#81bd41"
+		},
+		{
+			colorLabel: "orange",
+			arcColor: "#e59400",
+			lineColor: "#e59400",
+			textColor: "#e59400"
+		},
+		{
+			colorLabel: "blue",
+			arcColor: "#1a8fbf",
+			lineColor: "#1a8fbf",
+			textColor: "#1a8fbf"
+		}
+	];
+	const data = [{"label":"Industrial","value":18522010.69,"color":"#81bd41","percentage":11},{"label":"Mixed Use","value":118493310.7,"color":"#81bd41","percentage":71},{"label":"Office","value":29563687.12,"color":"#81bd41","percentage":18}];
+	
+	donutChartPolyLineUtility(420, 320, data, 120, chartColor, true, 'Square Foot');
+    
+	function donutChartPolyLineUtility(width, height, data, radius, colors, isDonut=true, valueType){
+		const svg = d3
+			.select("#donutChartCt")
+			.append("svg")
+			.attr("width", width)
+			.attr("height", height)
+			.append("g")
+			// .attr("transform", `translate(${width / 2}, ${width / 2})`);
+			.attr("transform", `translate(${radius * 1.75}, ${radius + 20})`);
+		const color = d3.scaleOrdinal(colors);
+		const pie = d3
+			.pie()
+			.value(d => d.value)
+			.sort(null);
+		let innerRadius = 0;
+		if (isDonut) innerRadius = radius - radius / 2;
+		const arc = d3
+			.arc()
+			.innerRadius(innerRadius)
+			.outerRadius(radius - radius / 10);
+		const outerArc = d3
+			.arc()
+			.innerRadius(radius)
+			.outerRadius(radius);
+
+		svg
+			.selectAll("path")
+			.data(pie(data))
+			.enter()
+			.append("path")
+			.attr("d", arc)
+			.attr("fill", (d, i) => color(i).arcColor);
+		svg.append("g").classed("labels", true);
+		svg.append("g").classed("lines", true);
+		svg.append("g").classed("values", true);
+		if (!isDonut) {
+			svg.append("g").classed("percentage", true);
+		}
+
+		// Polyline creation
+		svg
+			.select(".lines")
+			.selectAll("polyline")
+			.data(pie(data))
+			.enter()
+			.append("polyline")
+			.style("fill", "none")
+			.attr("stroke", (d, i) => color(i).lineColor)
+			.attr("points", function(d) {
+				const pos = outerArc.centroid(d);
+				pos[0] = radius * 1.5 * (midAngle(d) < Math.PI ? 1 : -1);
+				return [arc.centroid(d), outerArc.centroid(d), pos];
+			});
+
+		svg
+			.select(".labels")
+			.selectAll("text")
+			.data(pie(data))
+			.enter()
+			.append("text")
+			.attr("dy", "1.2em")
+			.attr("fill", (d, i) => color(i).textColor)
+			.text(function(d) {
+				return d.data.label;
+			})
+			.attr("transform", function(d) {
+				const pos = outerArc.centroid(d);
+				pos[0] = radius * 0.95 * (midAngle(d) < Math.PI ? 1 : -1);
+				return `translate(${pos})`;
+			})
+			.style("text-anchor", function(d) {
+				return midAngle(d) < Math.PI ? "start" : "end";
+			});
+
+		svg
+			.select(".values")
+			.selectAll("text")
+			.data(pie(data))
+			.enter()
+			.append("text")
+			.attr("dy", "-0.5em")
+			.text(function(d) {
+				return Number(d.data.value).toFixed(0);
+			})
+			.attr("transform", function(d) {
+				const pos = outerArc.centroid(d);
+				pos[0] = radius * 0.95 * (midAngle(d) < Math.PI ? 1 : -1);
+				return `translate(${pos})`;
+			})
+			.style("text-anchor", function(d) {
+				return midAngle(d) < Math.PI ? "start" : "end";
+			});
+
+		svg
+			.select(".percentage")
+			.selectAll("text")
+			.data(pie(data))
+			.enter()
+			.append("text")
+			.text(function(d) {
+				return `${d.data.percentage}%`;
+			})
+			.attr("transform", function(d) {
+				const pos = arc.centroid(d);
+				return `translate(${pos})`;
+			})
+			.style("text-anchor", "middle");
+
+		function midAngle(d) {
+			return d.startAngle + (d.endAngle - d.startAngle) / 2;
+		}
+	}
+  </script>
+
+</head>
+
+
+
+</html>
