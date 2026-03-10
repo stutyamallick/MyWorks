@@ -1,0 +1,118 @@
+fastapi
+uvicorn
+python-jose[cryptography]
+requests
+pydantic
+
+
+AUTH_SERVER = "http://localhost:9000"
+
+JWKS_URL = f"{AUTH_SERVER}/oauth2/jwks"
+
+ISSUER = AUTH_SERVER
+
+API_AUDIENCE = "api"
+
+
+
+
+
+
+import requests
+from jose import jwt
+from fastapi import HTTPException
+from config import JWKS_URL, ISSUER
+
+jwks = requests.get(JWKS_URL).json()
+
+
+def get_signing_key(token):
+
+    header = jwt.get_unverified_header(token)
+
+    for key in jwks["keys"]:
+        if key["kid"] == header["kid"]:
+            return key
+
+    return None
+
+
+def validate_jwt(token):
+
+    key = get_signing_key(token)
+
+    if not key:
+        raise HTTPException(status_code=401, detail="Invalid token key")
+
+    try:
+        payload = jwt.decode(
+            token,
+            key,
+            algorithms=["RS256"],
+            issuer=ISSUER,
+            options={"verify_aud": False}
+        )
+
+        return payload
+
+    except Exception:
+        raise HTTPException(status_code=401, detail="Token validation failed")
+
+
+
+
+
+
+from fastapi import Depends
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from security import validate_jwt
+
+security = HTTPBearer()
+
+
+def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
+
+    token = credentials.credentials
+
+    payload = validate_jwt(token)
+
+    return payload
+
+
+
+
+
+
+from fastapi import FastAPI, Depends
+from auth import get_current_user
+
+app = FastAPI(title="Python OAuth2 Resource Server")
+
+
+@app.get("/")
+def public_endpoint():
+    return {"message": "Public endpoint"}
+
+
+@app.get("/api/profile")
+def get_profile(user=Depends(get_current_user)):
+
+    return {
+        "userId": user.get("sub"),
+        "username": user.get("preferred_username"),
+        "scope": user.get("scope")
+    }
+
+
+@app.get("/api/admin")
+def admin_api(user=Depends(get_current_user)):
+
+    scopes = user.get("scope", "")
+
+    if "admin" not in scopes:
+        return {"error": "Admin scope required"}
+
+    return {
+        "message": "Admin access granted",
+        "user": user.get("sub")
+    }
